@@ -1,4 +1,8 @@
-# Heatwave based on daily temperature data
+# Heat wave index based on daily temperature data
+
+The World Meteorological Organization ([WMO](https://public.wmo.int/en)), defines a heat wave as five or more consecutive days of prolonged heat in which the daily maximum temperature is higher than the average maximum temperature by 5 °C (9 °F) or more.
+
+To measure the heat wave index, we can use one of recommendation of the Intergovernmental Panel on Climate Change ([IPCC](https://www.ipcc.ch/)) was to use the heat wave duration index (HWDI). This index has been defined as a period of five or more consecutive days with a maximum daily air temperature (Tmax) 5°C or more above the mean maximum daily temperature for the normal climatic period.
 
 ## Tools
 
@@ -26,15 +30,15 @@ California, USA
 
 3. Delete data who has 29th Feb
 
-	`for fl in *.nc; do cdo -delete,month=2,day=29 ./02_tasmax_annual/$fl ./03_tasmax_del29dfeb/$fl; done`
+	`for fl in *.nc; do cdo -delete,month=2,day=29 ./02_tasmax_annual/$fl ./03_tasmax_del29feb/$fl; done`
 
 	below script also works, using `del29dfeb`
 
-	`for fl in *.nc; do cdo -del29dfeb ./02_tasmax_annual/$fl ./03_tasmax_del29dfeb/$fl; done`
+	`for fl in *.nc; do cdo -del29feb ./02_tasmax_annual/$fl ./03_tasmax_del29feb/$fl; done`
 
 4. Convert Kelvin to degree Celsius and don't forget to change the variable (here tasmax) units, too. Combining operators:
 
-	`for fl in *.nc; do cdo -setattribute,tasmax@units="degC" -addc,-273.15 ./03_tasmax_del29dfeb/$fl ./04_tasmax_celsius/$fl; done`
+	`for fl in *.nc; do cdo -setattribute,tasmax@units="degC" -b 32 -addc,-273.15 ./03_tasmax_del29feb/$fl ./04_tasmax_celsius/$fl; done`
 
 5. Merge all nc files result from point 4 into single nc.
 
@@ -44,11 +48,30 @@ California, USA
 
 	`cdo ydrunmean,5,rm=c ./05_tasmax_all/usa_california_chelsa_daily_tasmax_1979_2016.nc ./06_tasmax_meanofreference/usa_california_chelsa_daily_tasmaxnorm_1979_2016.nc`
 
-7. Calculate heat wave duration index w.r.t mean of reference period
+7. Calculate annual heat wave duration index w.r.t mean of reference period
 
 	`for year in {1979..2016}; do cdo eca_hwdi ./04_tasmax_celsius/usa_california_chelsa_daily_tasmax_${year}.nc ./06_tasmax_meanofreference/usa_california_chelsa_daily_tasmaxnorm_1979_2016.nc ./07_hwdi/usa_california_chelsa_daily_hwdi_${year}.nc`
 
 
 ## Result
 
+to be updated
 
+## References
+
+1. https://www.wcrp-climate.org/etccdi
+2. http://etccdi.pacificclimate.org/list_27_indices.shtml
+3. https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf
+4. https://code.mpimet.mpg.de/projects/cdo/embedded/cdo_eca.pdf
+5. https://en.wikipedia.org/wiki/List_of_heat_waves
+
+**CDO operators**
+
+* `sellonlatbox` - Select a longitude/latitude box. https://code.mpimet.mpg.de/projects/cdo/embedded/index.html#x1-1760002.3.5
+* `mergetime` - Merge datasets sorted by date and time. https://code.mpimet.mpg.de/projects/cdo/embedded/index.html#x1-1130002.2.8
+* `delete` - Delete fields. https://code.mpimet.mpg.de/projects/cdo/embedded/index.html#x1-1540002.3.1
+* `del29feb` - the special CDO operator to remove all the '29th of february'. This operator is not yet documented.
+* `addc` - Add a constant. https://code.mpimet.mpg.de/projects/cdo/embedded/index.html#x1-3360002.7.3
+* `setattribute` - Set attribute. https://code.mpimet.mpg.de/projects/cdo/embedded/index.html#x1-2380002.6.1
+* `ydrunmean` - Multi year daily running mean. https://code.mpimet.mpg.de/projects/cdo/embedded/index.html#x1-5860002.8.37
+* `eca_hwdi` - Heat wave duration index. https://code.mpimet.mpg.de/projects/cdo/embedded/cdo_eca.pdf
