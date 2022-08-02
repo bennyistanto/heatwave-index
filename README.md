@@ -1,8 +1,8 @@
-# Heat wave index based on daily temperature data
+# Heat wave duration index based on daily temperature data
 
-The World Meteorological Organization ([WMO](https://public.wmo.int/en)), defines a heat wave as five or more consecutive days of prolonged heat in which the daily maximum temperature is higher than the average maximum temperature by 5 °C (9 °F) or more.
+The World Meteorological Organization ([WMO](https://public.wmo.int/en)), defines a heat wave as five or more consecutive days of prolonged heat in which the daily maximum temperature is higher than the average maximum temperature by 5°C (9°F) or more.
 
-To measure the heat wave index, we can use one of recommendation of the Intergovernmental Panel on Climate Change ([IPCC](https://www.ipcc.ch/)) was to use the heat wave duration index (HWDI). This index has been defined as a period of five or more consecutive days with a maximum daily air temperature (Tmax) 5°C or more above the mean maximum daily temperature for the normal climatic period.
+To measure the heat wave index, one of recommendation of the Intergovernmental Panel on Climate Change ([IPCC](https://www.ipcc.ch/)) was to use the heat wave duration index (HWDI). This index has been defined as a period of five or more consecutive days with a maximum daily air temperature (Tmax) 5°C or more above the mean maximum daily temperature for the normal climatic period.
 
 ## Tools
 
@@ -12,7 +12,7 @@ To measure the heat wave index, we can use one of recommendation of the Intergov
 
 ## Data
 
-1. Global high resolution (30 arc sec ~ 1km) daily maximum temperature data (available as 1 month data per 1 file) from CHELSA - https://chelsa-climate.org/, downloaded from https://data.isimip.org/datasets/92b05291-fbe5-4ed2-b3df-29ff0cded9f2/
+1. Global high resolution (30 arc sec ~ 1km) daily maximum temperature data (`tasmax`) available as 1 month data per 1 file, from CHELSA - https://chelsa-climate.org/, downloaded from https://data.isimip.org/datasets/92b05291-fbe5-4ed2-b3df-29ff0cded9f2/. Total size for `tasmax` data is 1.2 TB.
 
 ## Case
 
@@ -24,21 +24,23 @@ California, USA
 
 	`for fl in ./00_chelsa_global_tasmax/*.nc; do cdo sellonlatbox,-8.3,-7.6,12.3,12.9 $fl ./01_tasmax_/usa_california_`basename $fl`; done`
 
+	>Pre-computed result for step 1 is available in folder `01_tasmax`
+
 2. Merge monthly data into annual
 
 	`for year in {1979..2016}; do cdo mergetime ./01_tasmax/usa_california_chelsa-w5e5v1.0_obsclim_tasmax_30arcsec_global_daily_${year}??.nc ./02_tasmax_annual/usa_california_chelsa_daily_tasmax_${year}.nc; done`
 
 3. Delete data who has 29th Feb
 
-	`for fl in *.nc; do cdo -delete,month=2,day=29 ./02_tasmax_annual/$fl ./03_tasmax_del29feb/$fl; done`
+	`for year in {1979..2016}; do cdo -delete,month=2,day=29 ./02_tasmax_annual/usa_california_chelsa_daily_tasmax_${year}.nc ./03_tasmax_del29feb/usa_california_chelsa_daily_tasmax_${year}.nc; done`
 
 	below script also works, using `del29dfeb`
 
-	`for fl in *.nc; do cdo -del29feb ./02_tasmax_annual/$fl ./03_tasmax_del29feb/$fl; done`
+	`for year in {1979..2016}; do cdo -del29feb ./02_tasmax_annual/usa_california_chelsa_daily_tasmax_${year}.nc ./03_tasmax_del29feb/usa_california_chelsa_daily_tasmax_${year}.nc; done`
 
 4. Convert Kelvin to degree Celsius and don't forget to change the variable (here tasmax) units, too. Combining operators:
 
-	`for fl in *.nc; do cdo -setattribute,tasmax@units="degC" -b 32 -addc,-273.15 ./03_tasmax_del29feb/$fl ./04_tasmax_celsius/$fl; done`
+	`for year in {1979..2016}; do cdo -b 32 -setattribute,tasmax@units="degC" -addc,-273.15 ./03_tasmax_del29feb/usa_california_chelsa_daily_tasmax_${year}.nc ./04_tasmax_celsius/usa_california_chelsa_daily_tasmax_${year}.nc; done`
 
 5. Merge all nc files result from point 4 into single nc.
 
@@ -57,13 +59,15 @@ California, USA
 
 to be updated
 
+
 ## References
 
 1. https://www.wcrp-climate.org/etccdi
 2. http://etccdi.pacificclimate.org/list_27_indices.shtml
 3. https://code.mpimet.mpg.de/projects/cdo/embedded/cdo.pdf
 4. https://code.mpimet.mpg.de/projects/cdo/embedded/cdo_eca.pdf
-5. https://en.wikipedia.org/wiki/List_of_heat_waves
+5. https://data-infrastructure-services.gitlab-pages.dkrz.de/tutorials-and-use-cases/use-case_climate-extremes-indices_cdo.html
+6. https://en.wikipedia.org/wiki/List_of_heat_waves
 
 **CDO operators**
 
@@ -74,4 +78,5 @@ to be updated
 * `addc` - Add a constant. https://code.mpimet.mpg.de/projects/cdo/embedded/index.html#x1-3360002.7.3
 * `setattribute` - Set attribute. https://code.mpimet.mpg.de/projects/cdo/embedded/index.html#x1-2380002.6.1
 * `ydrunmean` - Multi year daily running mean. https://code.mpimet.mpg.de/projects/cdo/embedded/index.html#x1-5860002.8.37
+* `rm` - The read_method can be set to `c` for `circular` which takes into account the last time steps at the begin of the time period and vise versa. Otherwise, the first and last time steps are not used as often as the other time steps in the calculations.
 * `eca_hwdi` - Heat wave duration index. https://code.mpimet.mpg.de/projects/cdo/embedded/cdo_eca.pdf
