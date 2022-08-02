@@ -1,0 +1,1 @@
+This folder contains result from calculating the mean TXnorm of daily maximum temperatures for any period used as reference

@@ -1,0 +1,1 @@
+This folder contains result from converting process of Kelvin to degree Celsius.

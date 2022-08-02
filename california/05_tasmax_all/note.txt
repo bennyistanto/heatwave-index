@@ -1,0 +1,1 @@
+This folder contains result merge all the nc files (step 4) into single nc file, and will be a time series of the daily maximum temperature TX.

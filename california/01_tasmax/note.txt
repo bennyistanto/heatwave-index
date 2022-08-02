@@ -1,0 +1,1 @@
+This folder contains result from cliping process of global temperature data using bounding box information
