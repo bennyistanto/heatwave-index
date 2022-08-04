@@ -86,7 +86,7 @@ Lets start!
 7. Calculate annual heat wave duration index w.r.t mean of reference period
 
 	```bash
-	for year in {1979..2016}; do cdo eca_hwdi ./04_tasmax_celsius/usa_california_chelsa_daily_tasmax_${year}.nc ./06_tasmax_meanofreference/usa_california_chelsa_daily_tasmaxnorm_ref_1979_2016.nc ./07_hwdi/usa_california_chelsa_daily_hwdi_${year}.nc
+	for year in {1979..2016}; do cdo eca_hwdi ./04_tasmax_celsius/usa_california_chelsa_daily_tasmax_${year}.nc ./06_tasmax_meanofreference/usa_california_chelsa_daily_tasmaxnorm_ref_1979_2016.nc ./07_hwdi/usa_california_chelsa_daily_hwdi_${year}.nc; done
 	```
 
 
