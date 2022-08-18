@@ -83,6 +83,14 @@ Lets start!
 	cdo ydrunmean,5,rm=c ./05_tasmax_all/usa_california_chelsa_daily_tasmax_1979_2016.nc ./06_tasmax_meanofreference/usa_california_chelsa_daily_tasmaxnorm_ref_1979_2016.nc
 	```
 
+	Other alternative is to use 90th percentile of daily max temperature of a five windows centred. If you are interested to compute the running multi-year daily 90th percentile over all input timesteps for a running window of five days, use:
+
+	```bash
+	cdo ydrunmin,5 infile minfile 
+    cdo ydrunmax,5 infile maxfile 
+  	cdo ydrunpctl,90,5 infile minfile maxfile outfile
+	````
+
 7. Calculate annual heat wave duration index w.r.t mean of reference period
 
 	```bash
